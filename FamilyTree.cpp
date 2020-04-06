@@ -1,6 +1,29 @@
 #include "FamilyTree.hpp"
 #include <iostream>
 using namespace std;
+namespace helpFunctions 
+{
+    int split(string str)
+    {
+        int count=2;//the depth of the realtive is at least  2
+        int isTheLastGreat=false;
+        while(!isTheLastGreat) //until there is more great
+        {
+            string temp=str.substr(0,6);//split the great-
+            if(temp.compare("great-")!=0)//if the word is not great-
+            {
+                if(str.compare("grandfather")==0||str.compare("grandmother")==0)//if the word is grandmother or grandfather, finish
+                    isTheLastGreat=true;
+                else
+                    throw runtime_error("the word is illegal"); //the word is not legal
+            }
+            else
+                count++;
+            str=str.substr(6,str.length());
+        }
+        return count;
+    }
+}
 namespace family 
 {
     Tree& Tree::addFather(string son,string dad)
@@ -16,8 +39,6 @@ namespace family
         }
         node->father=new Tree(dad);
         node->father->son=node;
-        cout<<dad<<endl;
-    
         return *this;
     }
     Tree& Tree::addMother(string son,string mom)
@@ -33,7 +54,6 @@ namespace family
         }
         node->mother=new Tree(mom);
         node->mother->son=node;
-        cout<<mom<<endl;
         return *this;
     }
     string Tree::relation(string search)
@@ -56,19 +76,71 @@ namespace family
             gender="great-"+gender;
         return gender;
     }
-    string Tree::find(string std)
+    string Tree::find(string relation)
     {
-        return std;
+        if(relation == "me")
+            return (this->data);
+        if(relation == "father")
+        {
+            if(this->father!=NULL)
+                return (this->father->data);
+            throw runtime_error("could not find relation: "+relation);
+        }
+        if(relation == "mother")
+        {
+            if(this->mother!=NULL)
+                return (this->mother->data);
+            throw runtime_error("could not find relation: "+relation);
+        }
+        if(relation == "grandmother")
+        {
+            if(this->mother!=NULL&&this->mother->mother!=NULL)
+                return (this->mother->mother->data);
+            if(this->father!=NULL&&this->father->mother!=NULL)
+                return (this->father->mother->data);
+            throw runtime_error("could not find relation: "+relation);
+        }
+        if(relation == "grandfather")
+        {
+            if(this->mother!=NULL&&this->mother->father!=NULL)
+                return (this->mother->father->data);
+            if(this->father!=NULL&&this->father->father!=NULL)
+                return (this->father->father->data);
+            throw runtime_error("could not find relation: "+relation);
+        }
+        string ans="";
+        int depthTree=helpFunctions::split(relation);
+        string type=relation.substr(relation.length()-6,relation.length());//type==mother||father
+        if(type.compare("mother")==0)//if the type is mother
+            ans=helpFind(this,depthTree,1);
+        else
+            ans=helpFind(this,depthTree,0);
+        if(ans.compare("-1")==0)
+            throw runtime_error("co1uld not find relation: "+relation);
+        return ans;
     }
     string Tree::display()
     {
         return "";
     }
-    bool Tree::remove(string std)
+    bool Tree::remove(string name)
     {
+        Tree* node=findMe(this,name);
+        if(node==NULL)
+            return false;
+        Tree* sonTemp=node->son;
+        if(sonTemp!=NULL)
+        {
+            if(sonTemp->father!=NULL&&name==sonTemp->father->data)
+            {
+                sonTemp->father=NULL;
+            }
+            else
+                sonTemp->mother=NULL; 
+        }
+        delete node;
         return true;
     }
-    
     Tree* Tree::findMe(Tree* node, string name)
     {
         if(node == NULL) return NULL;
@@ -98,5 +170,21 @@ namespace family
         }
         return -1;
     }
-
+    string Tree::helpFind(Tree* node, int count,int type)
+    {
+        if(node == NULL) return "-1"; //The depth of this branch is smaller than count
+        if(count==1)
+        {
+            if(type==0&&node->father!=NULL)
+                return (node->father->data);
+            if(type==1&&node->mother!=NULL)
+                return (node->mother->data);
+            return "-1";//The depth of this branch is smaller than count
+        }
+        string motherBranch=helpFind(node->mother,count-1,type);
+        string fatherBranch=helpFind(node->father,count-1,type);
+        if(motherBranch.compare("-1")!=0)
+            return motherBranch;
+        return fatherBranch;
+    }
 }

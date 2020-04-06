@@ -36,5 +36,6 @@ class Tree{
 private:
     Tree* findMe(Tree*, string);
     int depth(Tree*, string);
+    string helpFind(Tree*,int,int);
     }; 
 };
