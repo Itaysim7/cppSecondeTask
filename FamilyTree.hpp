@@ -31,11 +31,12 @@ class Tree{
     Tree& addMother(string,string);
     string relation(string);
     string find(string);
-    string display();
+    void display();
     bool remove(string); 
 private:
     Tree* findMe(Tree*, string);
     int depth(Tree*, string);
     string helpFind(Tree*,int,int);
+    void print2DUtil(Tree *root, int space);
     }; 
 };

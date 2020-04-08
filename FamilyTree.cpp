@@ -15,7 +15,7 @@ namespace helpFunctions
                 if(str.compare("grandfather")==0||str.compare("grandmother")==0)//if the word is grandmother or grandfather, finish
                     isTheLastGreat=true;
                 else
-                    throw runtime_error("the word is illegal"); //the word is not legal
+                    throw runtime_error("The tree cannot handle the "+str+" relation"); //the word is not legal
             }
             else
                 count++;
@@ -29,11 +29,11 @@ namespace family
     Tree& Tree::addFather(string son,string dad)
     {
         Tree* node=findMe(this,son);
-        if(node==NULL)
+        if(node==NULL) //there is not node named son
         {
             throw runtime_error(""+son+ "' is not in the family tree");
         }
-        if(node->father!=NULL)
+        if(node->father!=NULL) //if there is father already
         {
             throw runtime_error("There is a father already");
         }
@@ -44,11 +44,11 @@ namespace family
     Tree& Tree::addMother(string son,string mom)
     {
         Tree* node=findMe(this,son);
-        if(node==NULL)
+        if(node==NULL) //there is not node named son
         {
             throw runtime_error(""+son+ "' is not in the family tree");
         }
-        if(node->mother!=NULL)
+        if(node->mother!=NULL) //if there is father already
         {
             throw runtime_error("There is a mother already");
         }
@@ -61,16 +61,16 @@ namespace family
         if(data==search)
             return "me";
         Tree* howIam=findMe(this,search);
-        if(howIam==NULL)
+        if(howIam==NULL) //if there is no node named search
             return "unrelated";
         string gender="mother";  
-        if(howIam->son->mother==NULL||howIam->son->mother->data!=search)
+        if(howIam->son->mother==NULL||howIam->son->mother->data!=search)  //if the gender is male
             gender="father";
-        int depthTree=depth(this,search);
-        if(depthTree==1)
+        int depthTree=depth(this,search); //find the depth of the tree
+        if(depthTree==1) //if it is mother or father
             return gender;
         gender="grand"+gender;
-        if(depthTree==2)
+        if(depthTree==2) //if it is grandMother or grandFather
             return gender;
         for(int i=depthTree-2;i>0;i--)
             gender="great-"+gender;
@@ -78,21 +78,21 @@ namespace family
     }
     string Tree::find(string relation)
     {
-        if(relation == "me")
+        if(relation == "me") //if its the root
             return (this->data);
-        if(relation == "father")
+        if(relation == "father") //if its the father
         {
             if(this->father!=NULL)
                 return (this->father->data);
             throw runtime_error("could not find relation: "+relation);
         }
-        if(relation == "mother")
+        if(relation == "mother")//if its the mother
         {
             if(this->mother!=NULL)
                 return (this->mother->data);
             throw runtime_error("could not find relation: "+relation);
         }
-        if(relation == "grandmother")
+        if(relation == "grandmother")//if its the grandMother
         {
             if(this->mother!=NULL&&this->mother->mother!=NULL)
                 return (this->mother->mother->data);
@@ -100,7 +100,7 @@ namespace family
                 return (this->father->mother->data);
             throw runtime_error("could not find relation: "+relation);
         }
-        if(relation == "grandfather")
+        if(relation == "grandfather")//if its the grandFather
         {
             if(this->mother!=NULL&&this->mother->father!=NULL)
                 return (this->mother->father->data);
@@ -119,29 +119,29 @@ namespace family
             throw runtime_error("co1uld not find relation: "+relation);
         return ans;
     }
-    string Tree::display()
+    void Tree::display()
     {
-        return "";
+       print2DUtil(this, 0);
     }
     bool Tree::remove(string name)
     {
         Tree* node=findMe(this,name);
-        if(node==NULL)
+        if(node==NULL) //if name is not in the tree
             return false;
         Tree* sonTemp=node->son;
         if(sonTemp!=NULL)
         {
-            if(sonTemp->father!=NULL&&name==sonTemp->father->data)
+            if(sonTemp->father!=NULL&&name==sonTemp->father->data) //if the gender is male
             {
                 sonTemp->father=NULL;
             }
-            else
+            else // the gender is female
                 sonTemp->mother=NULL; 
         }
         delete node;
         return true;
     }
-    Tree* Tree::findMe(Tree* node, string name)
+    Tree* Tree::findMe(Tree* node, string name) //find the node of name in the tree
     {
         if(node == NULL) return NULL;
         if(node->data == name) return node;
@@ -151,7 +151,7 @@ namespace family
         if(treeMother != NULL) return treeMother;
         return NULL;
     }
-    int Tree::depth(Tree* node, string name)
+    int Tree::depth(Tree* node, string name) //find the depth of the tree
     {
         if(node == NULL) return -1;
         if(node->data == name)
@@ -187,4 +187,16 @@ namespace family
             return motherBranch;
         return fatherBranch;
     }
+    void Tree::print2DUtil(Tree *root, int space)     // https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+    {  
+        if (root == NULL)          // Base case  
+            return;  
+        space += 10;          // Increase distance between levels  
+        print2DUtil(root->father, space);        // Process right child  
+        cout<<endl;          // Print current node after space  
+        for (int i = 10; i < space; i++)  
+            cout<<" ";  
+        cout<<root->data<<"\n";  
+        print2DUtil(root->mother, space);          // Process left child  
+    }  
 }
