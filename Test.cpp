@@ -157,6 +157,5 @@ TEST_CASE("Test Tree 1")
     CHECK( T1.relation("Michal") ==string("unrelated"));
     CHECK( T1.relation("Dani") ==string("unrelated"));
     CHECK(T1.relation("Yosi")==string("unrelated"));
-    CHECK( T1.relation("Itay") ==string("me"));
 
 }

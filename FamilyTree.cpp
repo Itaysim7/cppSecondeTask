@@ -125,6 +125,10 @@ namespace family
     }
     bool Tree::remove(string name)
     {
+        if(name==data)
+        {
+             throw runtime_error("You can't remove the root");
+        }
         Tree* node=findMe(this,name);
         if(node==NULL) //if name is not in the tree
             return false;
