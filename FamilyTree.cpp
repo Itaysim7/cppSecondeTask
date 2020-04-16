@@ -131,7 +131,7 @@ namespace family
         }
         Tree* node=findMe(this,name);
         if(node==NULL) //if name is not in the tree
-            return false;
+            throw runtime_error(""+name+" is not in the tree");
         Tree* sonTemp=node->son;
         if(sonTemp!=NULL)
         {
